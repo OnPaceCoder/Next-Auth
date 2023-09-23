@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect } from "react";
+import React, { FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -16,7 +16,8 @@ const page = () => {
   const [buttonDisabled, setButtonDisabled] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
-  const onSignUp = async () => {
+  const onSignUp = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
       setLoading(true);
       const response = await axios.post("/api/users/signup", user);
@@ -46,43 +47,74 @@ const page = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <h1>{loading ? "Processing" : "Signup"}</h1>
-      <hr />
-      <label htmlFor="username">username</label>
-      <input
-        className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-        type="text"
-        id="username"
-        value={user.username}
-        onChange={(e) => setUser({ ...user, username: e.target.value })}
-        placeholder="username"
-      />
-      <label htmlFor="email">email</label>
-      <input
-        className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-        type="text"
-        id="email"
-        value={user.email}
-        onChange={(e) => setUser({ ...user, email: e.target.value })}
-        placeholder="email"
-      />
-      <label htmlFor="password">password</label>
-      <input
-        className="p-2 border fborder-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-        type="password"
-        id="password"
-        value={user.password}
-        onChange={(e) => setUser({ ...user, password: e.target.value })}
-        placeholder="password"
-      />
+      <div className="flex flex-col gap-2 border border-gray-500 p-3 rounded-md w-1/4">
+        <h1 className="text-slate-400 font-bold py-2 text-center text-xl">
+          {loading ? "Processing" : "Signup"}
+        </h1>
+        <hr />
+        <form
+          action=""
+          className="flex flex-col gap-2  p-3 "
+          onSubmit={(e) => onSignUp(e)}
+        >
+          <label htmlFor="username" className="text-neutral-500 ">
+            Username
+          </label>
+          <input
+            className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
+            type="text"
+            id="username"
+            value={user.username}
+            onChange={(e) => setUser({ ...user, username: e.target.value })}
+            placeholder="John Doe"
+          />
+          <label htmlFor="email" className="text-neutral-500 ">
+            Email
+          </label>
+          <input
+            className="p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:border-gray-600 text-black"
+            type="text"
+            id="email"
+            value={user.email}
+            onChange={(e) => setUser({ ...user, email: e.target.value })}
+            placeholder="johndoe@email.com"
+          />
+          <label htmlFor="password" className="text-neutral-500 ">
+            Password
+          </label>
+          <input
+            className="p-2 border fborder-gray-300 rounded mb-4 focus:outline-none focus:border-gray-600 text-black"
+            type="password"
+            id="password"
+            value={user.password}
+            onChange={(e) => setUser({ ...user, password: e.target.value })}
+            placeholder="Password"
+          />
 
-      <button
-        onClick={onSignUp}
-        className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
-      >
-        {buttonDisabled ? "No Signup" : "Signup"}
-      </button>
-      <Link href={"/login"}>Visit Login Page</Link>
+          <button
+            type="submit"
+            className={`p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:border-gray-600 ${
+              buttonDisabled ? "text-neutral-500" : "text-white"
+            }`}
+            disabled={buttonDisabled}
+          >
+            {buttonDisabled ? "Signup" : "Signup"}
+          </button>
+          <Link
+            className="text-neutral-500 text-sm text-center"
+            href={"/login"}
+          >
+            Visit Login Page
+          </Link>
+          <hr />
+          <Link
+            href={"/forgotpassword"}
+            className="text-neutral-500 text-sm text-center"
+          >
+            Forgot Password{" "}
+          </Link>
+        </form>
+      </div>
     </div>
   );
 };
