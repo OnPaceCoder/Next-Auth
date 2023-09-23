@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     const reqBody = await request.json();
 
     const { token, newPassword } = reqBody.user;
-    console.log(token);
+   
     const user = await User.findOne({
       forgotPasswordToken: token,
       forgotPasswordTokenExpiry: { $gt: Date.now() },
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid token " }, { status: 400 });
     }
 
-    console.log(user);
+   
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(newPassword, salt);
 
