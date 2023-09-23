@@ -4,7 +4,7 @@ import axios from "axios";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-const page = () => {
+const Page = () => {
   const router = useRouter();
   const [data, setData] = React.useState("none");
   const logout = async () => {
@@ -57,4 +57,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
