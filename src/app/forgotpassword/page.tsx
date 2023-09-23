@@ -4,7 +4,7 @@ import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import React, { useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function ForgotPassword() {
@@ -20,10 +20,12 @@ export default function ForgotPassword() {
 
   useEffect(() => {
     const urlToken = window.location.search.split("=")[1];
-    setToken(urlToken || "");
+    setToken(urlToken);
+    setUser((prevUser) => ({ ...prevUser, token: urlToken }));
   }, []);
 
-  const onSubmit = async () => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
       setLoading(true);
 
@@ -39,9 +41,9 @@ export default function ForgotPassword() {
       setLoading(false);
     }
   };
-  const onSend = async () => {
-    setUser({ ...user, token });
-    console.log(user);
+  const onSend = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     try {
       if (user.confirmPassword !== user.newPassword) {
         throw new Error("Password mismatch");
@@ -51,7 +53,7 @@ export default function ForgotPassword() {
       const response = await axios.post("/api/users/updatepassword", {
         user,
       });
-      console.log(response.data);
+
       router.push("/login");
     } catch (error: any) {
       console.log(error.message);
@@ -62,59 +64,77 @@ export default function ForgotPassword() {
   };
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <h1>Forgot Password</h1>
-      <hr />
+      <div className="flex flex-col gap-2 border border-gray-500 p-3 rounded-md w-1/4">
+        <h1 className="text-slate-400 font-bold py-2 text-center text-xl">
+          Forgot Password
+        </h1>
+        <hr />
 
-      {token.length > 0 ? (
-        <div className="flex flex-col py-4">
-          <label htmlFor="username">New Password</label>
-          <input
-            className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-            type="password"
-            id="newPassword"
-            value={user.newPassword}
-            onChange={(e) => setUser({ ...user, newPassword: e.target.value })}
-            placeholder="New Password"
-          />
+        {token ? (
+          <div className="flex flex-col py-4">
+            <form
+              action=""
+              className="flex flex-col gap-2  p-3 "
+              onSubmit={(e) => onSend(e)}
+            >
+              <label htmlFor="username">New Password</label>
+              <input
+                className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
+                type="password"
+                id="newPassword"
+                value={user.newPassword}
+                onChange={(e) =>
+                  setUser({ ...user, newPassword: e.target.value })
+                }
+                placeholder="New Password"
+              />
 
-          <label htmlFor="password">Confirm password</label>
-          <input
-            className="p-2 border fborder-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-            type="password"
-            id="password"
-            value={user.confirmPassword}
-            onChange={(e) =>
-              setUser({ ...user, confirmPassword: e.target.value })
-            }
-            placeholder="Confirm Password"
-          />
+              <label htmlFor="password">Confirm password</label>
+              <input
+                className="p-2 border fborder-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
+                type="password"
+                id="password"
+                value={user.confirmPassword}
+                onChange={(e) =>
+                  setUser({ ...user, confirmPassword: e.target.value })
+                }
+                placeholder="Confirm Password"
+              />
 
-          <button
-            onClick={onSend}
-            className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
-          >
-            Submit
-          </button>
-        </div>
-      ) : (
-        <div>
-          <input
-            className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-          />
+              <button
+                type="submit"
+                className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
+              >
+                {loading ? "Processing..." : "Send"}
+              </button>
+            </form>
+          </div>
+        ) : (
+          <>
+            <form
+              action=""
+              className="flex flex-col gap-2  p-3 "
+              onSubmit={(e) => onSubmit(e)}
+            >
+              <input
+                className="p-2 border border-gray-300 rounded mb-2 focus:outline-none focus:border-gray-600 text-black"
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+              />
 
-          <button
-            onClick={onSubmit}
-            className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
-          >
-            Send
-          </button>
-        </div>
-      )}
+              <button
+                type="submit"
+                className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
+              >
+                {loading ? "Processing..." : "Send"}
+              </button>
+            </form>
+          </>
+        )}
+      </div>
     </div>
   );
 }
